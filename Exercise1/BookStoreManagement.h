@@ -9,8 +9,10 @@ public:
         Technical = 0,
         Management
     };
+    Book() : Book("Placeholder name", 0.0) {}
     Book(const std::string & name, const double & cost) : p_name(name), p_cost(cost) {}
-    Book(const Book & otherBook) : p_name(otherBook.GetName()), p_cost(otherBook.GetCost()) {}
+    Book(const Book & otherBook) = default;
+
     const std::string & GetName() const { return p_name; }
     virtual double      GetCost() const { return p_cost; }
 
@@ -60,6 +62,7 @@ public:
     void   Display() const;
     bool   operator==(const BookDetailed & other) const;
     void   AddStock(unsigned stock) { p_stock += stock; }
+    void   RemoveStock(unsigned stock) { p_stock -= stock; }
     double GetPrice(unsigned quantity) const;
 
 private:
@@ -75,6 +78,7 @@ public:
     void               AddBook();
     void               DisplayBooks() const;
     void               SearchBook() const;
+    void               BuyBook();
 
 private:
     BookStore() {}

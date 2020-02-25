@@ -1,6 +1,8 @@
 #include "BookStoreManagement.h"
 #include <iostream>
 
+using namespace std;
+
 BookStore * BookStore::s_pSingleStore = nullptr;
 
 BookStore * BookStore::CreateInstance()
@@ -14,20 +16,20 @@ void BookStore::DeleteInstance() { delete s_pSingleStore; }
 
 void BookStore::AddBook()
 {
-    std::string bookName;
+    string bookName;
     int         bookType = 1;
     unsigned    bookStock = 1;
     double      bookCost = 0.0;
 
-    std::cout << "Enter name of Book :" << std::endl;
-    std::cin >> bookName;
-    std::cout << "Enter type of Book, 1. Technical, 2. Management :" << std::endl;
-    std::cin >> bookType;
-    std::cout << "Enter cost of " << bookName << std::endl;
-    std::cin >> bookCost;
-    std::cout << "Enter stock of " << bookName << " to be added :" << std::endl;
-    std::cin >> bookStock;
-    std::cout << "------------------------------" << std::endl << std::endl << std::endl;
+    cout << "Enter name of Book :" << endl;
+    cin >> bookName;
+    cout << "Enter type of Book, 1. Technical, 2. Management :" << endl;
+    cin >> bookType;
+    cout << "Enter cost of " << bookName << endl;
+    cin >> bookCost;
+    cout << "Enter stock of " << bookName << " to be added :" << endl;
+    cin >> bookStock;
+    cout << "------------------------------" << endl << endl << endl;
 
     if (bookType > 2)
         bookType = 2; // TODO Print message
@@ -38,13 +40,13 @@ void BookStore::AddBook()
     if (bookStock > 0)
         P_AddBook(bookName, bookStock, bookCost, (Book::Type)(bookType));
     else
-        std::cout << "0 stock book not added" << std::endl;
+        cout << "0 stock book not added" << endl;
 }
 
 void BookStore::DisplayBooks() const
 {
     if (p_bookInventory.size() == 0)
-        std::cout << "No books in catalogue..." << std::endl;
+        cout << "No books in catalogue..." << endl;
     else
     {
         for (auto & detailedBook : p_bookInventory)
@@ -54,14 +56,50 @@ void BookStore::DisplayBooks() const
 
 void BookStore::SearchBook() const
 {
-    std::string bookName;
+    string bookName;
     unsigned    bookStock = 1;
+    if (p_bookInventory.size() == 0)
+    {
+        cout << "No books in catalogue" << endl;
+        return;
+    }
 
-    std::cout << "Enter name of Book :" << std::endl;
-    std::cin >> bookName;
-    std::cout << "Enter stock of " << bookName << " needed :" << std::endl;
-    std::cin >> bookStock;
-    std::cout << "------------------------------" << std::endl << std::endl << std::endl;
+    cout << "Enter name of Book :" << endl;
+    cin >> bookName;
+    cout << "Enter stock of " << bookName << " needed :" << endl;
+    cin >> bookStock;
+    cout << "------------------------------" << endl << endl << endl;
+
+    auto citer = p_bookInventory.cbegin();
+    for (; citer != p_bookInventory.cend(); ++citer)
+    {
+        if (citer->GetBook()->GetName() == bookName)
+            break;
+    }
+    if (citer == p_bookInventory.cend())
+        cout << "Book " << bookName << " not found!" << endl;
+    else
+    {
+        if (citer->GetStock() < bookStock)
+            cout << "Book " << bookName << " - insufficient stock found." << endl;
+        else
+            cout << "Book " << bookName << " available. Price for " << bookStock << " is "
+                      << citer->GetPrice(bookStock) << endl;
+    }
+}
+
+void BookStore::BuyBook()
+{
+    string bookName;
+    unsigned    bookStock = 1;
+    if (p_bookInventory.size() == 0)
+    {
+        cout << "No books in catalogue" << endl;
+        return;
+    }
+
+    cout << "Enter name of Book :" << endl;
+    cin >> bookName;
 
     auto iter = p_bookInventory.begin();
     for (; iter != p_bookInventory.end(); ++iter)
@@ -70,18 +108,33 @@ void BookStore::SearchBook() const
             break;
     }
     if (iter == p_bookInventory.end())
-        std::cout << "Book " << bookName << " not found!" << std::endl;
+        cout << "Book " << bookName << " not found!" << endl;
     else
     {
+        cout << "Enter stock of " << bookName << " needed :" << endl;
+        cin >> bookStock;
+        cout << "------------------------------" << endl << endl << endl;
         if (iter->GetStock() < bookStock)
-            std::cout << "Book " << bookName << " - insufficient stock found." << std::endl;
+            cout << "Book " << bookName << " - insufficient stock found." << endl;
         else
-            std::cout << "Book " << bookName << " available. Price for " << bookStock << " is "
-                      << iter->GetPrice(bookStock) << std::endl;
+        {
+            cout << "Book " << bookName << " available. Price for " << bookStock << " is "
+                      << iter->GetPrice(bookStock) << endl;
+            char answer = 'y';
+            cout << "Buy? (y/n)" << endl;
+            cin >> answer;
+            if (answer == 'y')
+            {
+                iter->RemoveStock(bookStock);
+                cout << bookStock << " " <<  bookName << " books bought" << endl;
+                if (iter->GetStock() == 0)
+                    p_bookInventory.erase(iter);
+            }
+        }
     }
 }
 
-void BookStore::P_AddBook(const std::string & bookName,
+void BookStore::P_AddBook(const string & bookName,
                           unsigned            bookStock,
                           double              bookCost,
                           Book::Type          type)
@@ -94,18 +147,17 @@ void BookStore::P_AddBook(const std::string & bookName,
     }
     if (iter == p_bookInventory.end())
     {
-        BookDetailed bookDetailed(bookName, bookStock, bookCost, type);
-        std::cout << "Adding book " << bookDetailed.GetBook()->GetName() << std::endl;
-        p_bookInventory.push_back(std::move(bookDetailed));
+        cout << "Adding book " << bookName << endl;
+        p_bookInventory.emplace_back(bookName, bookStock, bookCost, type);
     }
     else
     {
-        std::cout << "Adding " << bookStock << " to existing book " << bookName << std::endl;
+        cout << "Adding " << bookStock << " to existing book " << bookName << endl;
         iter->AddStock(bookStock);
     }
 }
 
-BookDetailed::BookDetailed(const std::string & bookName,
+BookDetailed::BookDetailed(const string & bookName,
                            unsigned            bookStock,
                            double              bookPrice,
                            Book::Type          bookType)
@@ -119,7 +171,7 @@ BookDetailed::BookDetailed(const std::string & bookName,
 
 void BookDetailed::Display() const
 {
-    std::cout << "Name : " << p_pBook->GetName() << "; Stock : " << p_stock << std::endl;
+    cout << "Name : " << p_pBook->GetName() << "; Stock : " << p_stock << endl;
 }
 
 bool BookDetailed::operator==(const BookDetailed & other) const

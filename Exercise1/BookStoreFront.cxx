@@ -1,14 +1,17 @@
 #include "BookStoreManagement.h"
 #include <iostream>
 
+using namespace std;
+
 void PrintFirstMenu()
 {
-    std::cout << "------------------------------" << std::endl;
-    std::cout << "Enter Option : " << std::endl;
-    std::cout << "0. Exit store" << std::endl;
-    std::cout << "1. Add book to store" << std::endl;
-    std::cout << "2. Display books in store" << std::endl;
-    std::cout << "3. Search book in store" << std::endl;
+    cout << "------------------------------" << endl;
+    cout << "Enter Option : " << endl;
+    cout << "0. Exit store" << endl;
+    cout << "1. Add book to store" << endl;
+    cout << "2. Display books in store" << endl;
+    cout << "3. Search book in store" << endl;
+    cout << "4. Buy book in store" << endl;
 }
 
 int main()
@@ -19,7 +22,7 @@ int main()
     {
         option = 0;
         PrintFirstMenu();
-        std::cin >> option;
+        cin >> option;
         switch (option)
         {
         case 1:
@@ -31,12 +34,15 @@ int main()
         case 3:
             pBookStore->SearchBook();
             break;
+        case 4:
+            pBookStore->BuyBook();
+            break;
         case 0:
             break;
         default:
-            std::cout << "Invalid option" << std::endl;
+            cout << "Invalid option" << endl;
         }
     }
     pBookStore->DeleteInstance();
-    std::cout << "Exiting..." << std::endl;
+    cout << "Exiting..." << endl;
 }
