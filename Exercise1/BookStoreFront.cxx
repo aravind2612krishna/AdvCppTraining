@@ -3,15 +3,24 @@
 
 using namespace std;
 
-void PrintFirstMenu()
+void PrintZerothMenu(bool allowOtherOptions = false)
 {
     cout << "------------------------------" << endl;
     cout << "Enter Option : " << endl;
     cout << "0. Exit store" << endl;
     cout << "1. Add book to store" << endl;
-    cout << "2. Display books in store" << endl;
-    cout << "3. Search book in store" << endl;
-    cout << "4. Buy book in store" << endl;
+    if (allowOtherOptions)
+        cout << "2. Display full menu" << endl;
+}
+
+void PrintFirstMenu()
+{
+    cout << "------------------------------" << endl;
+    cout << "Enter Option : " << endl;
+    cout << "0. Exit store" << endl;
+    cout << "1. Display books in store" << endl;
+    cout << "2. Search book in store" << endl;
+    cout << "3. Buy book in store" << endl;
 }
 
 int main()
@@ -21,23 +30,42 @@ int main()
     while (option)
     {
         option = 0;
-        PrintFirstMenu();
+        PrintZerothMenu(!pBookStore->IsEmptyInventory());
         cin >> option;
         switch (option)
         {
+        case 0:
+            break;
         case 1:
             pBookStore->AddBook();
             break;
         case 2:
+            if (!pBookStore->IsEmptyInventory())
+                break;
+        default:
+            cout << "Invalid option" << endl;
+        }
+        if (option == 2 && !pBookStore->IsEmptyInventory())
+            break;
+    }
+    pBookStore->FinalizeAdd(); // mem management
+    while (option)
+    {
+        option = 0;
+        PrintFirstMenu();
+        cin >> option;
+        switch (option)
+        {
+        case 0:
+            break;
+        case 1:
             pBookStore->DisplayBooks();
             break;
-        case 3:
+        case 2:
             pBookStore->SearchBook();
             break;
-        case 4:
+        case 3:
             pBookStore->BuyBook();
-            break;
-        case 0:
             break;
         default:
             cout << "Invalid option" << endl;

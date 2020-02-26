@@ -1,4 +1,4 @@
-#include <list>
+#include <vector>
 #include <string>
 
 class Book
@@ -55,6 +55,13 @@ public:
         p_stock = otherBookDetailed.p_stock;
         otherBookDetailed.p_pBook = nullptr;
     }
+    BookDetailed & operator=(BookDetailed && otherBookDetailed)
+    {
+        p_pBook = otherBookDetailed.p_pBook;
+        p_stock = otherBookDetailed.p_stock;
+        otherBookDetailed.p_pBook = nullptr;
+        return *this;
+    }
     ~BookDetailed() { if (p_pBook) delete p_pBook; }
     unsigned     GetStock() const { return p_stock; }
     const Book * GetBook() const { return p_pBook; }
@@ -79,12 +86,15 @@ public:
     void               DisplayBooks() const;
     void               SearchBook() const;
     void               BuyBook();
+    bool               IsEmptyInventory() const { return p_bookInventory.empty(); }
+    void               FinalizeAdd() { p_bookInventory.shrink_to_fit(); }
 
 private:
-    BookStore() {}
-    std::string             p_name;
-    std::list<BookDetailed> p_bookInventory;
-    static BookStore *      s_pSingleStore;
+    static constexpr unsigned expectedInventoryLength = 10;
+    BookStore() { p_bookInventory.reserve(expectedInventoryLength); }
+    std::string               p_name;
+    std::vector<BookDetailed> p_bookInventory;
+    static BookStore *        s_pSingleStore;
 
 private:
     static BookStore * P_CreateInstance();
